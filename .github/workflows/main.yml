@@ -45,7 +45,7 @@ jobs:
           # Branch name
           branch: ${{ github.head_ref || github.ref }}
           # Additional parameters for AST scan
-          additional_params: --scan-types sast,kics,sca --threshold sast-high=130 --threshold sca-high=10 --file-filter !readme --report-format sarif --output-name results
+          additional_params: --scan-types sast,kics,sca --threshold sast-high=300 --threshold sca-high=20 --file-filter !readme --report-format sarif --output-name results
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v1
         with:
