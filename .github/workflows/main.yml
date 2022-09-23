@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v3
 
       # Runs a single command using the runners shell
-      - name: Checkmarx AST Github Action
+      - name: Checkmarx AST Scan
   # You may pin to the exact commit or the version.
   # uses: Checkmarx/ast-github-action@0fcee7e03446692b38464ac6ec3a47bf1deb1c27
         uses: Checkmarx/ast-github-action@2.0.9
@@ -45,9 +45,27 @@ jobs:
           # Branch name
           branch: ${{ github.head_ref || github.ref }}
           # Additional parameters for AST scan
-          additional_params: --scan-types sast,kics,sca --threshold sast-high=300 --threshold sca-high=20 --file-filter !readme --report-format sarif --output-name results
+          additional_params: --scan-types sast,kics,sca --threshold sast-high=100 --threshold sca-high=10 --file-filter !readme --report-format sarif --output-name results
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v1
         with:
           # Path to SARIF file relative to the root of the repository
           sarif_file: results.sarif    
+      - name: Send mail
+        if: failure()
+        uses: dawidd6/action-send-mail@v2
+        with:
+          # mail server settings
+          server_address: smtp.gmail.com
+          server_port: 465
+          # user credentials
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          # email subject
+          subject: ${{ github.job }} job of ${{ github.repository }} has ${{ job.status }}
+          # email body as text
+          body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has vulnerabilities. Please review and fix issues.
+          # comma-separated string, send email to
+          to: minh.hoang@alexasecurity.net
+          # from email name
+          from: github
